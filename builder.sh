@@ -51,16 +51,16 @@ echo \"\\\\n\"\n
 # Check first arg for project name
 if [ -z "$1" ]
 then
-	echo "Você precisa inserir o nome do projeto";
+	echo "\nVocê precisa inserir o nome do projeto";
 else
 	if [ -d "$X_GIT_DIR/$X_NAME" ]
 	then
-		echo "Já existe um Projeto GIT com esse nome na past /var/git/$X_NAME"
+		echo "\nJá existe um Projeto GIT com esse nome na past /var/git/$X_NAME"
 		exit
 	fi
 	if [ -d "$X_WWW_DIR/$X_NAME" ]
 	then
-		echo "Já existe um Projeto WEB com esse nome na pasta /var/www/$X_NAME"
+		echo "\nJá existe um Projeto WEB com esse nome na pasta /var/www/$X_NAME"
 		exit
 	fi
 	if [ ! -d "$X_GIT_DIR" ]
@@ -81,6 +81,27 @@ else
 	echo "\n####CRIANDO VHOST NO APACHE\n"
 	echo $X_DEFAULT_VHOST > "$X_VHOSTS_DIR/$X_NAME.conf"
 	echo "\n####RECARREGANDO CONFIGURAÇÕES DO APACHE\n"
+	
+	if [ -z "$2" ]
+	then
+	    echo "\nVocê não optou por utilizar um framework\n"
+	else
+		cd "$X_WWW_DIR/$X_NAME"
+	    echo "\n####DOWNLOADING $2 ZIPBALL"
+	    wget "https://github.com/$2/archive/master.zip"
+	    if [ -e "master.zip" ]
+	    then
+	        unzip "master.zip"
+	        rm  "master.zip"
+	        #yet another pokemon reference
+	        master_zipball=$(echo $2 | sed 's/.*\///g')
+	        mv $(find $master_zipball-master/{.*,*} -maxdepth 0 -not -name "." -not -name "..") .
+	        rm $master_zipball-master -rf
+	    else
+	        echo "\nError downloading zipball"
+	    fi
+	fi
+
 	$X_SERVER_RELOAD
 	echo "\n####It's all done. Back to work!\n"
 	echo "\n\tProject Folder: $X_WWW_DIR/$X_NAME"
