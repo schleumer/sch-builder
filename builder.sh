@@ -4,7 +4,7 @@ X_NAME=$1
 X_HOST="schleumer.com.br"
 X_LOG_DIR="\${APACHE_LOG_DIR}"
 X_GIT_DIR="/var/git"
-X_APACHE_SITES_DIR="/etc/apache/sites-enabled"
+X_VHOSTS_DIR="/etc/apache/sites-enabled"
 X_WWW_DIR="/var/www"
 X_SERVER_RELOAD="service apache2 reload"
 #default framework git name
