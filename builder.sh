@@ -19,7 +19,7 @@ X_DEFAULT_VHOST="
 \tServerAdmin webmaster@$X_NAME.$X_HOST\n
 \tServerName $X_NAME.$X_HOST\n
 \tDocumentRoot $X_WWW_DIR/$X_NAME\n
-\t<Directory $X_WWW_DIR/$_XNAME>\n
+\t<Directory $X_WWW_DIR/$X_NAME>\n
 \t\tOptions Indexes FollowSymLinks MultiViews\n
 \t\tAllowOverride All\n
 \t\tOrder allow,deny\n
