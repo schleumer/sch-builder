@@ -27,9 +27,8 @@ X_DEFAULT_VHOST="
 \t</Directory>\n
 \tErrorLog $X_LOG_DIR/error.log\n
 \tLogLevel warn\n
-\tCustomLog $X_LOG_DIR/access.log combined\n
-</VirtualHost>\n
-"
+\tCustomLog $X_LOG_DIR/access.log combined
+\n</VirtualHost>"
 
 X_GIT_POST_RECEIVE_HOOK="
 #Add these commands to the file \n
