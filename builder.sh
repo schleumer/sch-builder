@@ -1,13 +1,17 @@
 #!/bin/sh
 
+rm /var/git/testie /var/www/testie /etc/apache2/sites-enabled/testie.conf -rf
+
 X_NAME=$1
 X_HOST="schleumer.com.br"
+X_SSH_HOST="schleumer.com.br"
 X_LOG_DIR="\${APACHE_LOG_DIR}"
 X_GIT_DIR="/var/git"
 X_VHOSTS_DIR="/etc/apache2/sites-enabled"
 X_WWW_DIR="/var/www"
 X_SERVER_RELOAD="service apache2 reload"
 X_SERVER_ADMIN="webmaster"
+X_WWW_CHMOD=777
 
 #default framework git name
 # user/project
@@ -16,7 +20,7 @@ X_SERVER_ADMIN="webmaster"
 # this will make download project's zípball from github
 X_CLONE_FRAMEWORK=$2
 
-X_DEFAULT_VHOST="
+X_DEFAULT_VHOST=$(cat <<EOF
 <VirtualHost *:80>\n
 \tServerAdmin $X_SERVER_ADMIN@$X_NAME.$X_HOST\n
 \tServerName $X_NAME.$X_HOST\n
@@ -30,9 +34,11 @@ X_DEFAULT_VHOST="
 \tErrorLog $X_LOG_DIR/error.log\n
 \tLogLevel warn\n
 \tCustomLog $X_LOG_DIR/access.log combined
-\n</VirtualHost>"
+\n</VirtualHost>
+EOF
+)
 
-X_GIT_POST_RECEIVE_HOOK="
+X_GIT_POST_RECEIVE_HOOK=$(cat <<EOF
 #Add these commands to the file \n
 echo \"\\\\n\"\n
 echo \"********************\"\n
@@ -46,21 +52,22 @@ unset GIT_DIR\n
 git pull origin master\n
 #End of commands for post-receive hook\n
 echo \"\\\\n\"\n
-"
+EOF
+)
 
 # Check first arg for project name
 if [ -z "$1" ]
 then
-	echo "\nVocê precisa inserir o nome do projeto";
+	printf "\nVocê precisa inserir o nome do projeto";
 else
 	if [ -d "$X_GIT_DIR/$X_NAME" ]
 	then
-		echo "\nJá existe um Projeto GIT com esse nome na past /var/git/$X_NAME"
+		printf "\nJá existe um Projeto GIT com esse nome na past /var/git/$X_NAME"
 		exit
 	fi
 	if [ -d "$X_WWW_DIR/$X_NAME" ]
 	then
-		echo "\nJá existe um Projeto WEB com esse nome na pasta /var/www/$X_NAME"
+		printf "\nJá existe um Projeto WEB com esse nome na pasta /var/www/$X_NAME"
 		exit
 	fi
 	if [ ! -d "$X_GIT_DIR" ]
@@ -68,45 +75,48 @@ else
 		mkdir "$X_GIT_DIR"
 	fi
 	cd "$X_GIT_DIR"
-	echo "\n####CRIANDO REPOSITÓRIO GIT EM MODO BARE \n"
+	printf "\n####CRIANDO REPOSITÓRIO GIT EM MODO BARE \n"
 	git init --bare $X_NAME
-	echo "\n####CRIANDO HOOK DE POST RECEIVE DENTRO DO REPOSITÓRIO GIT \n"
+	printf "\n####CRIANDO HOOK DE POST RECEIVE DENTRO DO REPOSITÓRIO GIT \n"
 	echo $X_GIT_POST_RECEIVE_HOOK > "$X_GIT_DIR/$X_NAME/hooks/post-receive"
-	echo "\n####DANDO PERMISSÕES AO HOOK PARA SER EXECUTADO \n"
+	printf "\n####DANDO PERMISSÕES AO HOOK PARA SER EXECUTADO \n"
 	chmod +x "$X_GIT_DIR/$X_NAME/hooks/post-receive"
-	echo "\n####CLONANDO NO PROJETO WEB \n"
+	printf "\n####CLONANDO NO PROJETO WEB \n"
 	mkdir -p "$X_WWW_DIR/$X_NAME"
 	cd "$X_WWW_DIR"
 	git clone "file://$X_GIT_DIR/$X_NAME" "$X_NAME"
-	echo "\n####CRIANDO VHOST NO APACHE\n"
+	printf "\n####CRIANDO VHOST NO APACHE\n"
 	echo $X_DEFAULT_VHOST > "$X_VHOSTS_DIR/$X_NAME.conf"
-	echo "\n####RECARREGANDO CONFIGURAÇÕES DO APACHE\n"
+	printf "\n####RECARREGANDO CONFIGURAÇÕES DO APACHE\n"
 	
 	if [ -z "$2" ]
 	then
-	    echo "\nVocê não optou por utilizar um framework\n"
+	    printf "\nVocê não optou por utilizar um framework\n"
 	else
-		cd "$X_WWW_DIR/$X_NAME"
-	    echo "\n####DOWNLOADING $2 ZIPBALL"
+	    cd "$X_WWW_DIR/$X_NAME"
+	    printf "\n####DOWNLOADING $2 ZIPBALL\n"
 	    wget "https://github.com/$2/archive/master.zip"
 	    if [ -e "master.zip" ]
 	    then
 	        unzip "master.zip"
 	        rm  "master.zip"
 	        #yet another pokemon reference
-	        master_zipball=$(echo $2 | sed 's/.*\///g')
-	        mv $(find $master_zipball-master/{.*,*} -maxdepth 0 -not -name "." -not -name "..") .
+	        master_zipball=$(printf $2 | sed 's/.*\///g')
+		FILES_ON_ZIP=$(ls $master_zipball-master/ -a | sed "s#^#"${PWD}"/$master_zipball-master/#g" | grep -v "\.$\|\.$") 
+	        mv $FILES_ON_ZIP "$X_WWW_DIR/$X_NAME"
+		chmod $X_WWW_CHMOD $X_WWW_DIR/$X_NAME -R
 	        rm $master_zipball-master -rf
 	    else
-	        echo "\nError downloading zipball"
+	        printf "\nError downloading zipball"
 	    fi
 	fi
 
 	$X_SERVER_RELOAD
-	echo "\n####It's all done. Back to work!\n"
-	echo "\n\tProject Folder: $X_WWW_DIR/$X_NAME"
-	echo "\n\tGit Folder Folder: $X_GIT_DIR/$X_NAME"
-	echo "\n\tGit Clone: git clone ssh://$X_SSH_HOST:$X_GIT_DIR"
+
+	printf "\n####It's all done. Back to work!\n"
+	printf "\n\tProject Folder: $X_WWW_DIR/$X_NAME"
+	printf "\n\tGit Folder Folder: $X_GIT_DIR/$X_NAME"
+	printf "\n\tGit Clone: git clone ssh://$X_SSH_HOST:$X_GIT_DIR\n"
 fi
 
 
