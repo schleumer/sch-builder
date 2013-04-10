@@ -7,6 +7,8 @@ X_GIT_DIR="/var/git"
 X_VHOSTS_DIR="/etc/apache2/sites-enabled"
 X_WWW_DIR="/var/www"
 X_SERVER_RELOAD="service apache2 reload"
+X_SERVER_ADMIN="webmaster"
+
 #default framework git name
 # user/project
 # example:
@@ -16,7 +18,7 @@ X_CLONE_FRAMEWORK=$2
 
 X_DEFAULT_VHOST="
 <VirtualHost *:80>\n
-\tServerAdmin webmaster@$X_NAME.$X_HOST\n
+\tServerAdmin $X_SERVER_ADMIN@$X_NAME.$X_HOST\n
 \tServerName $X_NAME.$X_HOST\n
 \tDocumentRoot $X_WWW_DIR/$X_NAME\n
 \t<Directory $X_WWW_DIR/$X_NAME>\n
@@ -46,6 +48,7 @@ git pull origin master\n
 echo \"\\\\n\"\n
 "
 
+# Check first arg for project name
 if [ -z "$1" ]
 then
 	echo "Você precisa inserir o nome do projeto";
