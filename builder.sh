@@ -1,7 +1,5 @@
 #!/bin/sh
 
-rm /var/git/testie /var/www/testie /etc/apache2/sites-enabled/testie.conf -rf
-
 X_NAME=$1
 X_HOST="schleumer.com.br"
 X_SSH_HOST="schleumer.com.br"
