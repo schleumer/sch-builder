@@ -4,7 +4,7 @@ X_NAME=$1
 X_HOST="schleumer.com.br"
 X_LOG_DIR="\${APACHE_LOG_DIR}"
 X_GIT_DIR="/var/git"
-X_VHOSTS_DIR="/etc/apache/sites-enabled"
+X_VHOSTS_DIR="/etc/apache2/sites-enabled"
 X_WWW_DIR="/var/www"
 X_SERVER_RELOAD="service apache2 reload"
 #default framework git name
@@ -77,7 +77,7 @@ else
 	cd "$X_WWW_DIR"
 	git clone "file://$X_GIT_DIR/$X_NAME" "$X_NAME"
 	echo "\n####CRIANDO VHOST NO APACHE\n"
-	echo $X_DEFAULT_VHOST > "$X_VHOSTS_DIR/$X_NAME"
+	echo $X_DEFAULT_VHOST > "$X_VHOSTS_DIR/$X_NAME.conf"
 	echo "\n####RECARREGANDO CONFIGURAÇÕES DO APACHE\n"
 	$X_SERVER_RELOAD
 	echo "\n####It's all done. Back to work!\n"
