@@ -80,7 +80,10 @@ else
 	echo $X_DEFAULT_VHOST > "$X_VHOSTS_DIR/$X_NAME"
 	echo "\n####RECARREGANDO CONFIGURAÇÕES DO APACHE\n"
 	$X_SERVER_RELOAD
-	echo "\n####É NÓIS LEK\n"
+	echo "\n####It's all done. Back to work!\n"
+	echo "\n\tProject Folder: $X_WWW_DIR/$X_NAME"
+	echo "\n\tGit Folder Folder: $X_GIT_DIR/$X_NAME"
+	echo "\n\tGit Clone: git clone ssh://$X_SSH_HOST:$X_GIT_DIR"
 fi
 
 
